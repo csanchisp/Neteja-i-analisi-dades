@@ -1,5 +1,3 @@
-# Tipologia i cicle de vida de les dades
-
 # Pràctica 2: Neteja i anàlisi de dades
 
 ## Descripció
