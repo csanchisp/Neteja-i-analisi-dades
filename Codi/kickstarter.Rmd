@@ -337,8 +337,6 @@ data$usd_goal_disc  <-
                           ifelse(data$usd_goal_real<50000, 'Medium',
                                  ifelse(data$usd_goal_real<100000, 'High','Very High'))))
 data$usd_goal_disc <- as.factor(data$usd_goal_disc)
-
-data
 ```
 
 
