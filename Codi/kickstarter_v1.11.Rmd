@@ -1,0 +1,611 @@
+---
+title: "Tipologia i cicle de vida de les dades -  Pràctica 2. Kickstarter"
+author: "Ivan Borrego Garcia / Cristina Sanchis Puerto"
+date: "GENER 2020"
+output:
+  html_document:
+    highlight: default
+    number_sections: yes
+    theme: cosmo
+    toc: yes
+    toc_depth: 2
+  pdf_document:
+    toc: yes
+    toc_depth: '2'
+---
+
+```{r setup, include=FALSE}
+options(knitr.table.format = "html")
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Presentació
+En aquesta pràctica s’elabora un cas pràctic orientat a aprendre a identificar les dades rellevants per un projecte analític i usar les eines d’integració, neteja, validació i anàlisi de les mateixes. Per fer aquesta pràctica haureu de treballar en grups de 2 persones. Haureu de lliurar un sol fitxer
+amb l’enllaç Github (https://github.com) on es trobin les solucions incloent els noms dels components de l’equip. Podeu utilitzar la Wiki de Github per descriure el vostre equip i els diferents arxius que corresponen a la vostra entrega. Cada membre de l’equip haurà de contribuir amb el seu usuari Github. Malgrat que no es tracta del mateix enunciat, els següents exemples d’edicions anteriors us poden servir com a guia:
+
+● Exemple: https://github.com/Bengis/nba-gap-cleaning
+
+● Exemple complex (fitxer adjunt).
+
+# Competències
+En aquesta pràctica es desenvolupen les següents competències del Màster de Data Science:
+
+● Capacitat d'analitzar un problema en el nivell d'abstracció adequat a cada situació i aplicar les habilitats i coneixements adquirits per abordar-lo i resoldre'l.
+
+● Capacitat per aplicar les tècniques específiques de tractament de dades (integració, transformació, neteja i validació) per al seu posterior anàlisi.
+
+# Objectius
+Els objectius concrets d’aquesta pràctica són:
+
+● Aprendre a aplicar els coneixements adquirits i la seva capacitat de resolució de problemes en entorns nous o poc coneguts dintre de contextos més amplis o
+multidisciplinaris.
+
+● Saber identificar les dades rellevants i els tractaments necessaris (integració, neteja i validació) per dur a terme un projecte analític.
+
+● Aprendre a analitzar les dades adequadament per abordar la informació continguda en les dades.
+
+● Identificar la millor representació dels resultats per tal d’aportar conclusions sobre el problema plantejat en el procés analític.
+
+● Actuar amb els principis ètics i legals relacionats amb la manipulació de dades en funció de l'àmbit d'aplicació.
+
+● Desenvolupar les habilitats d'aprenentatge que els permetin continuar estudiant d'una manera que haurà de ser en gran manera autodirigida o autònoma.
+
+● Desenvolupar la capacitat de cerca, gestió i ús d'informació i recursos en l'àmbit de la ciència de dades.
+
+# Descripció de la Pràctica a realitzar
+L’objectiu d’aquesta activitat serà el tractament d’un dataset, que pot ser el creat a la pràctica 1 o bé qualsevol dataset lliure disponible a Kaggle (https://www.kaggle.com). Alguns exemples de dataset amb els que podeu treballar són:
+
+● Red Wine Quality (https://www.kaggle.com/uciml/red-wine-quality-cortez-et-al-2009 ).
+
+● Titanic: Machine Learning from Disaster (https://www.kaggle.com/c/titanic ).
+
+L’últim exemple correspon a una competició activa a Kaggle de manera que, opcionalment, podeu aprofitar el treball realitzat durant la pràctica per entrar en aquesta competició. Seguint les principals etapes d’un projecte analític, les diferents tasques a realitzar (i justificar) són les següents:
+
+# Pràctica:
+
+*****
+## DESCRIPCIÓ DEL DATASET
+*****
+
+> __Perquè és important i quina pregunta/problema pretén respondre?__
+
+Kickstater és una plataforma de micromecenatge (crowdfunding) nord-americana. En ella és possible finançar projectes creatius de tot tipus, des de cinema independent fins productes tecnològics, passant per còmics, jocs o cuina.
+
+Tot projecte especificarà des de el començament les dates d'inici i final de l'activitat a la plataforma, que seran les que el creador consideri oportunes, tot i que el rang normalment es troba entre unes poques setmanes i diversos mesos. El projecte també haurà d'indicar quina és la recaptació mínima de diners per considerar el mecenatge com a exitós i per tant iniciar el projecte.
+
+Durant aquest temps qualsevol usuari pot participar en el mecenatge, fet que normalment es realitza escollint un dels diferents nivells d'aportació establerts pel creador del projecte, que solen incloure una còpia o participació del producte final que es vol crear. Cal tenir en compte que les aportacions es fan efectives un cop hagi acabat el temps d'activitat fixat i només si s'ha assolit l'objectiu monetari inicial. Si no és el cas, el projecte es considera fracassat i no es realitza cap pagament.
+
+És per tant, important per a un nou creador revisar la trajectòria de projectes anteriors semblants, per estudiar les característiques tant dels projectes exitosos com dels que no.
+
+*__ID__               : Identificador únic del projecte.<p>
+*__name__             : Nom del projecte.<p>
+*__category__         : Categoria específica del projecte.<p>
+*__main_category__    : Categoria general del projecte.<p>
+*__currency__         : Moneda en la que gestiona la recaptació.<p>
+*__deadline__         : Data del final de la campanya de mecenatge.<p>
+*__goal__             : Quantitat minima de diners aportats per considerar el projecte exitós.<p>
+*__launched__         : Data de llençament de la campanya de mecenatge.<p>
+*__pledged__          : Quantitat aportada al final de la campanya.<p>
+*__state__            : Estat en que es troba el projecte.<p>
+*__backers__          : Nombre de persones mecenes.<p>
+*__country__          : País d'origen del projecte.<p>
+*__usd.pledged__      : Conversió a dolars americans de la quantitat recaptada (feta per Kickstarter)<p>
+*__usd_pledged_real__ : Conversió a dolars americans de la quantitat recaptada (feta per plataforma independent fixer.io)<p>
+*__usd_goal_real__    : Conversió a dolars americans de la quantitat requerida (feta per plataforma independent fixer.io)<p>
+
+*****
+## INTEGRACIÓ I SELECCIÓ DE LES DADES D'INTERÈS A ANALITZAR
+*****
+
+```{r}
+# Paquets
+suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(lubridate))
+suppressPackageStartupMessages(library(ggpubr)) 
+
+# Llegim les dades
+data<- read.csv("ks-projects-201801.csv", header=T, sep=",")
+
+# Verifiquem l'estructura del joc de dades
+str(data)
+
+# Consultem les primeres files del conjunt de dades
+head(data)
+```
+
+<p>Observem que tenim, 378661 observacions i 15 atributs.<p> 
+
+<p>Verifiquem que no hi hagi projectes duplicats. La comprobació la fem a partir de la variable ID que és l'identificador únic del projecte.<p> 
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Projectes duplicats?
+length(unique(data$ID))
+```
+
+<p>No hi ha registres duplicats, ja que hi ha 378661 valors diferents de la variable ID, que és el nombre total d'observacions que conté el conjunt de dades.<p>
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Estadístiques de valors buits
+colSums(is.na(data))
+colSums(data=="")
+```
+
+<p>Una vegada, hem consultat si hi ha projectes duplicats, es pot prescindir de la columna ID, que com hem comentat abans, és l'identificador únic del projecte. Per a l'anàlisi de les dades que volem realitzar, l'atribut identificador no ens aporta valor.<p>
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Eliminem atribut ID
+data$ID <- NULL
+```
+
+<p>A continuació formategem els atributs que fan referència a la data: launched and deadline. Pel que fa a la variable launched, les hores, minuts i segons, no ens interessa. El format per ambdues variables será YYYY-MM-DD. Posteriorment seleccionarem els registres a partir de l'any 2015.<p> 
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Formategem launched i deadline
+data$launched <- as.Date(substr(as.character(data$launched), 1, 10), "%Y-%m-%d")
+data$deadline <- as.Date(as.character(data$deadline), "%Y-%m-%d")
+
+# Filtrem dades: Projecte del 2015 en endavant
+data <- data[data$launched >= "2015-01-01",]
+
+# Registres després del filtratge
+dim(data)
+```
+<p>El nombre de registres ha passat de 378661 observacions, a 186808 registres. Seleccionant els registres a partir de l'any 2015, hem realitzat una reducció de la quantitat del conjunt de dades.<p>
+
+<p>Considerem que és interessant, conèixer la durada dels projectes, per tant, creem una nova variable "duration_days", que serà la duració en dies del projecte, des de la data de llançament de la campanya (launched) fins a la data final de la campanya (deadline).<p>
+
+<p>Igualment serà interessant disposar dels valors mitjans de les aportacions i del percentatge total assolit.<p>
+
+<p>També s'inclou un nou atribut, perquè volem distribuir els països per regió.<p>
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Creem la variable duration_days
+data$duration_days <- as.integer(data$deadline-data$launched)
+
+# Creem la variable mean_pledged
+data$mean_pledged <- ifelse(data$backers==0, data$mean_pledged<-0, data$mean_pledged<-data$usd_pledged_real/data$backers)
+
+# Creem la variable percent_pledged
+data$percent_pledged <- (data$usd_pledged_real/data$usd_goal_real)*100
+
+# Creem la variable region
+data$region <- ifelse(data$country=='N,0"', data$region<-NA,
+                      ifelse(data$country=="US"|data$country=="CA", data$region<-"North America",
+                             ifelse(data$country=="AU"|data$country=="NZ"|data$country=="HK"|
+                                      data$country=="SG"|data$country=="JP", data$region<- "Asia & Pacific",
+                                    ifelse(data$country=="MX", data$region<- "Latin America",
+                                           data$region<-"Europe")
+                                    )
+                             )
+                      )
+
+data$region <- as.factor(data$region)
+
+# Consultem les primeres files del conjunt de dades
+head(data)
+```
+
+<p>Podem prescindir de les variables, goal, pledge. La variable goal correspon a la quantitat mínima de diners aportats per considerar el projecte exitós, i la variable pledge és la quantitat aportada al final de la campanya. Existeixen tres variables més que fan referència a l'import, on s'ha realitzat una conversió a dòlars americans (USD), per tant per a realitzar l'anàlisi dels projectes, s'utilitzaran les conversions en dòlars, que correspon a les variables usd_goal_real, usd_plegded_real i usd.pledged. No considerem eliminar l'atribut currency, perquè pensem que és interessant, conèixer en quantes divises diferents s'està treballant, i saber si la divisa del projecte és un factor per a garantir el seu èxit o no.<p>
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Reducció de la dimensionalitat, eliminem variables...
+data$goal        <- NULL
+data$pledged     <- NULL
+```
+
+<p>Si s'observa el resum de l'estructura de les dades, la variable name està definida com una variable de tipus factor. Canviem el seu tipus, ja que el nom d'un projecte, no es deu considerar de tipus factor, sinó més bé de tipus string.<p>
+
+<p>També es consulta la quantitat de categories pel que fa a la variable category i main_category<p>
+
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# La variable name és un string
+data$name <- as.character(data$name)
+
+# category
+length(levels(data$category))
+# main_category
+length(levels(data$main_category))
+levels(data$main_category)
+```
+
+<p>Existeixen 159 categories per als projectes, distribuides en 15 categories principals. Per tant, es treballarà amb la categoria principal del projecte. S'elimina l'atribut category.<p>
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Reducció de la dimensionalitat, eliminem variable category
+data$category <- NULL
+# Resum final de l'estructura de les dades
+str(data)
+# Resum de les dades
+summary(data)
+```
+
+*****
+## NETEJA DE LES DADES
+*****
+
+> __Les dades contenen zeros o elements buits? Com gestionaries aquests casos?__
+
+<p>Els valors 0 no sempre fa referència a un valor perdut, pot ser un valor buit legítim. A continuació, s'analitzen les variables del conjunt per tal de saber si contenen zeros o elements buits, per saber com gestionar-los i considerar si es tracta d'errors o no. Per exemple, sense fer una anàlisi exhaustiva, podríem dir, que en les variables relacionades amb els diners si existís un zero, no hauria de ser un error, ja que poden haver-hi projectes en els quals no hi hagi cap mena d'aportació econòmica, en canvi veure un element buit ens podria generar dubte, ja que podria ser un zero que no hi ha hagut aportació econòmica o bé que no se sap que ha passat.<p>
+
+<p>Consultem les estadístiques de valors buits.<p>
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Estadístiques de valors buits per atributs
+colSums(is.na(data))
+```
+
+<p>En aquest cas, s'observa que l'única variable que conté valors buits és la variable usd_pledge. En canvi, s'observa que per a la variable usd_pledge_real no existeix cap valor buit. Ambdues variables, fan referència a la conversió a dolars americans de la quantitat recaptada, amb la diferència que la conversió de usd_pledged està feta per Kickstarter i usd_pledged_real està feta per una plataforma independent fixer.io. En aquest cas, eliminar l'atribut usd_pledged, no suposa una pèrdua d'informació, ja que també tenim la informació a la variable uds_pledge_real i és més consistent. Ara bé, abans d'eliminar usd_pledged, es consultarà quins valors conté usd_pledged_real quan usd_pledged no està informada. És clar que aquestes dues variables no són dependents, ja que el calcul de la conversió es realitza a partir de la variable goal, on a l'inici de la pràctica s'ha vist que aquesta variable goal tampoc contenia valors buits com la variable usd_pledge_real.<p>
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Consultem dades quan usd.pledged conté valors buits
+head(data[is.na(data$usd.pledged),])
+# Consultem dades quan usd_pledge_real és 0 per saber si usd_pledge també té valors buits
+head(data[which(data$usd_pledged_real == 0),])
+```
+
+<p>S'observa que quan usd.pledge té valors buits, la variable country és N,0 i la variable state és undefined, per tant hi ha una relació entre aquestes variables. I quan la variable usd_pledged_real és 0, usd_pledge no té valors buits.<p>
+
+<p>Les úniques variables amb valors que podríem considerar incoherents són state (undefined) i country (N,0"), i sembla que estan relacionades.<p>
+<p>A través de la següents gràfiques comprovem que la variable usd.pledged quan conté valors buits, està relacionada amb el valor country = N,0" i state = undefined.<p>
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Relació state vs country
+ggplot(data,aes(x=country,fill=state))+geom_bar(position="fill")+ylab("Distribució")+
+   theme(text = element_text(size=12),axis.text.x = element_text(angle=60, hjust=1))
+
+# usd.pledged == NA vs state vs country
+ggplot(data[is.na(data$usd.pledged),],aes(x=country,fill=state))+geom_bar(position="fill")+ylab("Distribució")+
+   theme(text = element_text(size=12),axis.text.x = element_text(angle=60, hjust=1))
+```
+
+<p>Per tant considerem els valors country = N,0" com a incorrectes i els eliminem de l'estudi.<p>
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Eliminem country = N,0" 
+data <- data[data$country!='N,0"',]
+# Quants registres amb data$usd.pledged == NA hi ha?
+count(data[is.na(data$usd.pledged),])
+```
+
+<p>Una vegeda, eliminats els registres amb country = N,0", comprovem que no hi ha cap observació al conjunt de dades amb usd.pledged amb valors buits. Finalment, decidim eliminar la variable usd.pledged, perquè usd_pledged_real és més consistent.<p>
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+data$usd.pledged <- NULL
+```
+
+<p> A continuació, es comprova per a les variables quantitatives, si el fet de contenir 0 o no es tracta d'un error, o en canvi, és un valor buit legítim.<p>
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# backers - nombre de persones mecenes
+count(data[which(data$backers == 0),])
+# duration_days 
+count(data[which(data$duration_days == 0),])
+# usd_pledged_real 
+count(data[which(data$usd_pledged_real == 0),])
+# usd_goal_real 
+count(data[which(data$usd_goal_real == 0),])
+# mean_pledged
+count(data[which(data$mean_pledged == 0),])
+# percent_pledged
+count(data[which(data$percent_pledged == 0),])
+```
+
+<p> S'observa que per a les variables backers, usd_pledge_real, mean_pledged i percent_pledged existeixen cap a uns 30 mil registres informats amb el valor 0. En aquest cas, pot tenir un sentit, és a dir, poden haver-hi projectes en els quals no s'hagi recaptat diners i projectes en els no hi hagi cap nombre de persones mecenes. En aquest cas, el valor té sentit, ara bé per exemple, si el nombre de persones mecenes és zero i el projecte és considerat com a exitós no tindria sentit. I el mateix amb la variable usd_pledged_real, el fet que no es recapten diners per a un projecte i el seu estat és exitós tampoc tindria sentit.<p>
+
+<p>Pel que fa a la variable usd_goal_real i duration_days, no contenen cap valor zero. Per aquestes variables, trobar-se un valor zero, seria considerat un valor perdut o un error. Ja que el més normal és que per a un projecte s'informi d'una quantitat requerida, i almenys hauria d'haver-hi un dia entre la data de llançament del mecenatge i la data final de la campanya de mecenatge del projecte.<p>
+
+<p>Per tant, s'analitza si tenen sentit els valors a zero per a les variables backers i usd_pleged_real.<p>
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Te sentit el 0 de backers i usd_pleged_real?
+# Valors de la variable state
+levels(data$state)
+# Relació backers vs state
+data_aux  <- data[which(data$backers == 0),]
+tabla_aux <- table(data_aux$state, data_aux$backers)
+tabla_aux
+# Relació usd_pledged_real vs state
+data_aux  <- data[which(data$usd_pledged_real == 0),]
+tabla_aux <- table(data_aux$state,data_aux$usd_pledged_real)
+tabla_aux
+```
+
+<p>Després de consultar la taula de contingència, pel que fa a la relació entre la variable backers i state i la variable usd_pledge_real i state. S'observa que efectivament quan usd_pledge_real és 0, cap projecte ha sigut exitós, el mateix passa amb la variable backers.<p>
+
+> __Identificació i tractament de valors extrems.__
+
+<p>Com ja sabem, els valors extrems són les dades que difereixen significativament dels valors de les distribucions normals d’una variable. Els valors estan molt lluny respecte als altres, sobre 3 desviacions estàndard sobre la mitjana del conjunt. Es generen sospites si les dades han sigut generades amb el mateix mecanisme o no. Per tant, són una amenaça important per a la validesa i generalització dels resultats, poden causar problemes en l'anàlisi estadística de les dades, com augmentar la variància de l'error; si es distribueixen de forma no aleatòria, s'alteren les probabilitats de cometre errors de tipus I i II amb els contrasts d'hipòtesis; també poden influir o esbiaixar greument en les estimacions que poden ser d'interès important, ja que poden no ser generades per la població que ens interessa. En resum, augmenten de manera dràstica els errors d'inferència i redueix dràsticament la força i el poder de les proves estadístiques.<p>
+
+<p>Pot ser interessant discretitzar goal per visualitzar amb més detall les variables resultat<p>
+
+```{r}
+#centers <- sort(kmeans(data$usd_goal_real,5)$centers)
+#cl <- kmeans(data$usd_goal_real,centers)
+#
+#vlow   <- subset(data$usd_goal_real, cl$cluster==1)
+#low    <- subset(data$usd_goal_real, cl$cluster==2)
+#med    <- subset(data$usd_goal_real, cl$cluster==3)
+#high   <- subset(data$usd_goal_real, cl$cluster==4)
+#vhigh  <- subset(data$usd_goal_real, cl$cluster==5)
+#list(sort(vlow4),sort(low4),sort(med4),sort(high4),sort(vhigh4))
+
+data$usd_goal_disc  <-
+            ifelse(data$usd_goal_real<2000, 'Very Low',
+                   ifelse(data$usd_goal_real<10000, 'Low',
+                          ifelse(data$usd_goal_real<50000, 'Medium',
+                                 ifelse(data$usd_goal_real<100000, 'High','Very High'))))
+data$usd_goal_disc <- as.factor(data$usd_goal_disc)
+
+data
+```
+
+
+<p>A continuació s'analitzen si hi ha valors extrems i si són errors de les dades o no.<p>
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Gràfic - Boxplot - backers
+outlier1 <- ggplot(data, aes(x=main_category, y=backers)) +
+            facet_wrap(~usd_goal_disc) +
+            geom_boxplot() + labs(x="Categoria del projecte") +
+            scale_y_continuous(name="Nombre de persones mecenes") +
+            theme(plot.title = element_text(size=11), axis.text.x= element_text(angle=60, hjust=1)) +
+            ggtitle("AMB OUTLIERS - Boxplot - backers") 
+outlier1
+
+# Gràfic - Boxplot - usd_pledged_real
+outlier2 <- ggplot(data, aes(x=main_category, y=usd_pledged_real)) +
+            facet_wrap(~usd_goal_disc) +
+            geom_boxplot() + labs(x="Categoria del projecte") +
+            scale_y_continuous(name="Quantitat recaptada en USD") +
+            theme(plot.title = element_text(size=11), axis.text.x= element_text(angle=60, hjust=1)) +
+            ggtitle("AMB OUTLIERS - Boxplot - usd_pledged_real") 
+outlier2
+
+
+# Boxplot - usd_goal_real
+outlier3 <- ggplot(data, aes(x=main_category, y=usd_goal_real)) +
+            geom_boxplot() + labs(x="Categoria del projecte") +
+            scale_y_continuous(name="Quantitat requerida en USD") +
+            theme(plot.title = element_text(size=11), axis.text.x= element_text(angle=60, hjust=1)) +
+            ggtitle("AMB OUTLIERS - Boxplot - usd_goal_real") 
+outlier3
+
+# Boxplot - duration_days
+outlier4 <- ggplot(data, aes(x=main_category, y=duration_days)) +
+            geom_boxplot() + labs(x="Categoria del projecte") +
+            scale_y_continuous(name="Dies de la campanya") +
+            theme(plot.title = element_text(size=11), axis.text.x= element_text(angle=60, hjust=1)) +
+            ggtitle("AMB OUTLIERS - Boxplot - duration_days")
+outlier4
+
+# Boxplot - mean_pledged
+outlier5 <- ggplot(data, aes(x=main_category, y=mean_pledged)) +
+            geom_boxplot() + labs(x="Categoria del projecte") +
+            scale_y_continuous(name="Mitjana d'aportacions") +
+            theme(plot.title = element_text(size=11), axis.text.x= element_text(angle=60, hjust=1)) +
+            ggtitle("AMB OUTLIERS - Boxplot - mean_pledged")
+outlier5
+
+# Boxplot - percent_pledged
+outlier6 <- ggplot(data, aes(x=main_category, y=percent_pledged)) +
+            geom_boxplot() + labs(x="Categoria del projecte") +
+            scale_y_continuous(name="Percentatge sobre el total") +
+            theme(plot.title = element_text(size=11), axis.text.x= element_text(angle=60, hjust=1)) +
+            ggtitle("AMB OUTLIERS - Boxplot - percent_pledged")
+outlier6
+
+# Agafem els valors dels outliers
+outlier_backers <- boxplot(data$backers, plot = FALSE)$out
+outlier_pledged <- boxplot(data$usd_pledged_real, plot = FALSE)$out
+outlier_goal    <- boxplot(data$usd_goal_real, plot = FALSE)$out
+outlier_days    <- boxplot(data$duration_days, plot = FALSE)$out
+outlier_mean    <- boxplot(data$mean_pledged, plot = FALSE)$out
+outlier_percent <- boxplot(data$percent_pledged, plot = FALSE)$out
+
+# Recompte d'outliers, entesos com els que queden "fora" del boxplot
+
+outliersNumber <- c(length(outlier_backers), length(outlier_pledged), length(outlier_goal),
+                    length(outlier_days), length(outlier_mean), length(outlier_percent))
+
+outliersNumber
+```
+
+<p>Si observem el recompte de valors extrems, és un nombre molt alt, on el fet d'eliminar tots els outliers pot tenir un efecte considerable sobre el conjunt de dades en el que estem treballant. Però el fet de deixar aquests valors, també afecta les mitjanes, variàncies...<p>
+
+<p>No podem però eliminar aquests outliers, no només formen part del conjunt sino que són casos d'interés per l'estudi.<p>
+
+<p>Optem per realitzar una comparativa de com quedarien els resultats si eliminem els valors extrems que estàn més enllà d'un percentil determinat. Ja que pot ser interessant, deixar els valors extrems i saber quin és el perfil de projectes amb aquest tipus de dades.<p>
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+percentil <- 0.5
+data_aux <- data[data$backers          < quantile(data$backers, percentil) &
+                 data$usd_pledged_real < quantile(data$usd_pledged_real, percentil) &
+                 data$usd_goal_real    < quantile(data$usd_goal_real, percentil) &
+                 data$duration_days    < quantile(data$duration_days, percentil) &
+                 data$mean_pledged     < quantile(data$mean_pledged, percentil),]
+
+# Files
+dim(data_aux)
+
+# Comparem amb els resultats anteriors
+outlier7 <- ggplot(data_aux, aes(x=main_category, y=backers)) +
+            geom_boxplot() + labs(x="Categoria del projecte") +
+            scale_y_continuous(name="Nombre de persones mecenes") +
+            theme(plot.title = element_text(size=11), axis.text.x= element_text(angle=60, hjust=1)) +
+            ggtitle("SENSE OUTLIERS - Boxplot - backers")
+
+# Grafica AMB OUTLIERS vs SENSE OUTLIERS - backers
+ggarrange(outlier1, outlier7, ncol = 1, nrow = 2)
+```
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Gràfic - Boxplot - usd_pledged_real
+outlier8 <- ggplot(data_aux, aes(x=main_category, y=usd_pledged_real)) +
+            geom_boxplot() + labs(x="Categoria del projecte") +
+            scale_y_continuous(name="Quantitat recaptada en USD") +
+            theme(plot.title = element_text(size=11), axis.text.x= element_text(angle=60, hjust=1)) +
+            ggtitle("SENSE OUTLIERS - Boxplot - usd_pledged_real") 
+
+# Grafica AMB OUTLIERS vs SENSE OUTLIERS - usd_pledged_real
+ggarrange(outlier2, outlier8, ncol = 1, nrow = 2)
+```
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Boxplot - usd_goal_real
+outlier9 <- ggplot(data_aux, aes(x=main_category, y=usd_goal_real)) +
+            geom_boxplot() + labs(x="Categoria del projecte") +
+            scale_y_continuous(name="Quantitat requerida en USD") +
+            theme(plot.title = element_text(size=11), axis.text.x= element_text(angle=60, hjust=1)) +
+            ggtitle("SENSE OUTLIERS - Boxplot - usd_goal_real") 
+
+# Grafica AMB OUTLIERS vs SENSE OUTLIERS - usd_goal_real
+ggarrange(outlier3, outlier9, ncol = 1, nrow = 2)
+```
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Boxplot - duration_days
+outlier10 <- ggplot(data_aux, aes(x=main_category, y=duration_days)) +
+             geom_boxplot() + labs(x="Categoria del projecte") +
+             scale_y_continuous(name="Dies de la campanya") +
+             theme(plot.title = element_text(size=11), axis.text.x= element_text(angle=60, hjust=1)) +
+             ggtitle("SENSE OUTLIERS - Boxplot - duration_days")
+
+# Grafica AMB OUTLIERS vs SENSE OUTLIERS - duration_days
+ggarrange(outlier4, outlier10, ncol = 1, nrow = 2)
+```
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Boxplot - mean_pledged
+outlier11 <- ggplot(data_aux, aes(x=main_category, y=mean_pledged)) +
+             geom_boxplot() + labs(x="Categoria del projecte") +
+             scale_y_continuous(name="Mitjana d'aportacions") +
+             theme(plot.title = element_text(size=11), axis.text.x= element_text(angle=60, hjust=1)) +
+             ggtitle("SENSE OUTLIERS - Boxplot - mean_pledged")
+
+# Grafica AMB OUTLIERS vs SENSE OUTLIERS - mean_pledged
+ggarrange(outlier5, outlier11, ncol = 1, nrow = 2)
+```
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Boxplot - mean_pledged
+outlier12 <- ggplot(data_aux, aes(x=main_category, y=percent_pledged)) +
+             geom_boxplot() + labs(x="Categoria del projecte") +
+             scale_y_continuous(name="Percentatge sobre el total") +
+             theme(plot.title = element_text(size=11), axis.text.x= element_text(angle=60, hjust=1)) +
+             ggtitle("SENSE OUTLIERS - Boxplot - percent_pledged")
+
+# Grafica AMB OUTLIERS vs SENSE OUTLIERS - percent_pledged
+ggarrange(outlier6, outlier12, ncol = 1, nrow = 2)
+```
+
+<p>Fitxer de sortida<p>
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Escrivim les dades finals en un fitxer csv
+write.csv(data, "ks-projects-201801_final.csv")
+```
+
+
+*****
+## ANÀLISI DE LES DADES
+*****
+
+> __Selecció dels grups de dades que es volen analitzar/comparar (planificació dels anàlisis a aplicar)__
+
+<p>L'objectiu principal és analitzar els projectes finalitzats, concretament la relació entre resultat i altres variables relatives als mecenes, categories, aportacions, la localització geogràfica o la campanya.<p>
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# subset de state amb failed, canceled o succesful (estats de projectes amb la campanya finalitzada)
+# És l'atribut més rellevant, podem comprovar per paisos, categories, periode de l'any, o mitjana d'aportacions (backers/pledged)
+datares <- data[(data$state=="failed" | data$state=="canceled" | data$state=="successful"),]
+summary(datares)
+
+```
+
+<p>Un segon set de dades inclou els projectes encara en actiu en el moment en què es van recollir les dades. En aquest cas farem una predicció del resultat basant-nos en les dades del set anterior<p>
+
+```{r}
+dataliv <- data[data$state=="live",]
+summary(dataliv)
+```
+
+
+> __Comprovació de la normalitat i homogeneïtat de la variància.__
+
+```{r}
+shapiro.test(sample(datares$duration_days,5000))
+```
+
+
+> __Aplicació de proves estadístiques per comparar els grups de dades. En funció de les dades i de l’objectiu de l’estudi, aplicar proves de contrast d’hipòtesis, correlacions, regressions, etc. Aplicar almenys tres mètodes d’anàlisi diferents.__
+
+Anotacions per a tenir en compte per a l'analisi:
+
+- Per quins grups de dades separem? Estari bé separar per estat de projecte o projectes amb estat acabat (failed,canceled,successful) i projectes en curs (state=live) 
+- Es pot calcular la probabilitat que hi ha d'acabar amb èxit un projecte (state=live)
+- Per al contrast d'hipotesis, podem veure si hi ha les mateixes possibilitats de tenir èxit als USA, a Europa, o a Àsia (de ser així podem crear una altra variable continent?)
+- A major nombre de persones mecenes hi ha més probabilitat de tenir èxit al projecte?
+- Les mitjanes d'aportació són les mateixes en totes les categories?
+- Per a la normalitat aplicar qqplot i shapiro.test
+- La variable a predir pot ser usd_pledged_real
+
+*****
+## REPRESENTACIÓ DELS RESULTATS A PARTIR DE TAULES i GRÀFIQUES.
+*****
+
+*****
+## RESOLUCIÓ DEL PROBLEMA
+*****
+
+> __A partir dels resultats obtinguts, quines són les conclusions? Els resultats permeten respondre al problema?__
+
+*****
+## CODI
+*****
+
+# Recursos
+Els següents recursos són d’utilitat per la realització de la pràctica:
+
+● Calvo M., Subirats L., Pérez D. (2019). Introducción a la limpieza y análisis de los datos. Editorial UOC.
+
+● Megan Squire (2015). Clean Data. Packt Publishing Ltd.
+
+● Jiawei Han, Micheine Kamber, Jian Pei (2012). Data mining: concepts and techniques. Morgan Kaufmann.
+
+● Jason W. Osborne (2010). Data Cleaning Basics: Best Practices in Dealing with Extreme Scores. Newborn and Infant Nursing Reviews; 10 (1): pp. 1527-3369.
+
+● Peter Dalgaard (2008). Introductory statistics with R. Springer Science & Business Media.
+
+● Wes McKinney (2012). Python for Data Analysis. O’Reilley Media, Inc.
+
+● Tutorial de Github https://guides.github.com/activities/hello-world.
+
+# Criteris de valoració
+Tots els apartat són obligatoris. La ponderació dels exercicis és la següent:
+
+● Els apartats 1, 2 i 6 valen 0,5 punts.
+
+● Els apartats 3,5 i 7 valen 2 punts.
+
+● L’apartat 4 val 2,5 punts.
+
+Es valorarà la idoneïtat de les respostes, que han de ser clares i completes. Les diferents etapes han d’estar ben justificades i acompanyades del codi corresponent. També es valorarà la síntesi i claredat, a través de l’ús de comentaris, del codi resultant, així com la qualitat de les dades finals analitzades.
+
+# Format i data de lliurament
+Durant la setmana del 23 de desembre el grup podrà lliurar al professor una entrega parcial opcional. Aquesta entrega parcial és molt recomanable per tal de rebre assessorament sobre la pràctica i verificar que la direcció presa és la correcta. Es lliuraran comentaris als estudiants que hagin efectuat l’entrega parcial però no comptarà per la nota de la pràctica. En l’entrega parcial els estudiants hauran de lliurar per correu electrònic (mcalvogonza@uoc.edu) l’enllaç al repositori Github amb el que hagin avançat.
+
+Pel que fa a l’entrega final, cal lliurar un únic fitxer que contingui l’enllaç a Github on hi hagi:
+
+1. Una Wiki on hi hagi els noms dels components del grup i una descripció dels fitxers.
+
+2. Un document Word, Open Office o PDF amb les respostes a les preguntes i els noms dels components del grup. A més, al final de document, haurà d’aparèixer la següent taula de contribucions al treball, la qual ha de signar cada integrant del grup amb les seves inicials. Les inicials representen la confirmació de que l’integrant ha participat en aquell apartat. Tots els integrants han de participar en cadascun dels apartats, de manera que, idealment, els apartats hauran d’estar signats per tots els integrants.
+
+3. Una carpeta amb el codi generat per analitzar les dades.
+
+4. El fitxer CSV amb les dades originals.
+
+5. El fitxer CSV amb les dades finals analitzades.
+
+Aquest document de l’entrega final de la Pràctica 2 s’ha de lliurar a l’espai de Lliurament i Registre d’AC de l’aula abans de les 23:59 del dia 7 de gener. No s’acceptaran lliuraments fora de termini.
+
