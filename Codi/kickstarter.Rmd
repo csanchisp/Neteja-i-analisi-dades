@@ -1,14 +1,8 @@
 ---
 title: "Tipologia i cicle de vida de les dades -  Pràctica 2. Kickstarter"
-author: "Ivan Borrego Garcia / Cristina Sanchis Puerto"
+Author: "Ivan Borrego Garcia / Cristina Sanchis Puerto"
 date: "GENER 2020"
 output:
-  word_document:
-    toc: yes
-    toc_depth: '2'
-  pdf_document:
-    toc: yes
-    toc_depth: '2'
   html_document:
     highlight: default
     number_sections: yes
@@ -324,6 +318,7 @@ tabla_aux
 <p>Pot ser interessant discretitzar goal per visualitzar amb més detall les variables resultat<p>
 
 ```{r}
+
 data$usd_goal_disc  <-
             ifelse(data$usd_goal_real<2000, 'Very Low',
                    ifelse(data$usd_goal_real<10000, 'Low',
