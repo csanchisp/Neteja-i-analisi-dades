@@ -1,6 +1,6 @@
 ---
 title: "Tipologia i cicle de vida de les dades -  Pràctica 2. Kickstarter"
-author: "Ivan Borrego Garcia / Cristina Sanchis Puerto"
+Author: "Ivan Borrego Garcia / Cristina Sanchis Puerto"
 date: "GENER 2020"
 output:
   html_document:
@@ -9,9 +9,6 @@ output:
     theme: cosmo
     toc: yes
     toc_depth: 2
-  pdf_document:
-    toc: yes
-    toc_depth: '2'
 ---
 
 ```{r setup, include=FALSE}
@@ -321,15 +318,6 @@ tabla_aux
 <p>Pot ser interessant discretitzar goal per visualitzar amb més detall les variables resultat<p>
 
 ```{r}
-#centers <- sort(kmeans(data$usd_goal_real,5)$centers)
-#cl <- kmeans(data$usd_goal_real,centers)
-#
-#vlow   <- subset(data$usd_goal_real, cl$cluster==1)
-#low    <- subset(data$usd_goal_real, cl$cluster==2)
-#med    <- subset(data$usd_goal_real, cl$cluster==3)
-#high   <- subset(data$usd_goal_real, cl$cluster==4)
-#vhigh  <- subset(data$usd_goal_real, cl$cluster==5)
-#list(sort(vlow4),sort(low4),sort(med4),sort(high4),sort(vhigh4))
 
 data$usd_goal_disc  <-
             ifelse(data$usd_goal_real<2000, 'Very Low',
@@ -345,7 +333,6 @@ data$usd_goal_disc <- as.factor(data$usd_goal_disc)
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
 # Gràfic - Boxplot - backers
 outlier1 <- ggplot(data, aes(x=main_category, y=backers)) +
-            facet_wrap(~usd_goal_disc) +
             geom_boxplot() + labs(x="Categoria del projecte") +
             scale_y_continuous(name="Nombre de persones mecenes") +
             theme(plot.title = element_text(size=11), axis.text.x= element_text(angle=60, hjust=1)) +
@@ -354,7 +341,6 @@ outlier1
 
 # Gràfic - Boxplot - usd_pledged_real
 outlier2 <- ggplot(data, aes(x=main_category, y=usd_pledged_real)) +
-            facet_wrap(~usd_goal_disc) +
             geom_boxplot() + labs(x="Categoria del projecte") +
             scale_y_continuous(name="Quantitat recaptada en USD") +
             theme(plot.title = element_text(size=11), axis.text.x= element_text(angle=60, hjust=1)) +
@@ -414,7 +400,7 @@ outliersNumber
 
 <p>No podem però eliminar aquests outliers, no només formen part del conjunt sino que són casos d'interés per l'estudi.<p>
 
-<p>Optem per realitzar una comparativa de com quedarien els resultats si eliminem els valors extrems que estàn més enllà d'un percentil determinat. Ja que pot ser interessant, deixar els valors extrems i saber quin és el perfil de projectes amb aquest tipus de dades.<p>
+<p>Optem per realitzar una comparativa de com quedarien els resultats si eliminem els valors extrems que estàn més enllà d'un percentil determinat. Ja que pot ser interessant deixar els valors extrems i saber quin és el perfil de projectes amb aquest tipus de dades.<p>
 
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
 percentil <- 0.5
