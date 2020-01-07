@@ -1,0 +1,1098 @@
+---
+title: "Tipologia i cicle de vida de les dades -  Pràctica 2. Kickstarter"
+author: "Ivan Borrego Garcia / Cristina Sanchis Puerto"
+date: "GENER 2020"
+output:
+  html_document:
+    highlight: default
+    number_sections: yes
+    theme: cosmo
+    toc: yes
+    toc_depth: 2
+  pdf_document:
+    toc: yes
+    toc_depth: '2'
+  word_document:
+    toc: yes
+    toc_depth: '2'
+---
+
+```{r setup, include=FALSE}
+options(knitr.table.format = "html")
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Presentació
+En aquesta pràctica s’elabora un cas pràctic orientat a aprendre a identificar les dades rellevants per un projecte analític i usar les eines d’integració, neteja, validació i anàlisi de les mateixes. Per fer aquesta pràctica haureu de treballar en grups de 2 persones. Haureu de lliurar un sol fitxer
+amb l’enllaç Github (https://github.com) on es trobin les solucions incloent els noms dels components de l’equip. Podeu utilitzar la Wiki de Github per descriure el vostre equip i els diferents arxius que corresponen a la vostra entrega. Cada membre de l’equip haurà de contribuir amb el seu usuari Github. Malgrat que no es tracta del mateix enunciat, els següents exemples d’edicions anteriors us poden servir com a guia:
+
+● Exemple: https://github.com/Bengis/nba-gap-cleaning
+
+● Exemple complex (fitxer adjunt).
+
+# Competències
+En aquesta pràctica es desenvolupen les següents competències del Màster de Data Science:
+
+● Capacitat d'analitzar un problema en el nivell d'abstracció adequat a cada situació i aplicar les habilitats i coneixements adquirits per abordar-lo i resoldre'l.
+
+● Capacitat per aplicar les tècniques específiques de tractament de dades (integració, transformació, neteja i validació) per al seu posterior anàlisi.
+
+# Objectius
+Els objectius concrets d’aquesta pràctica són:
+
+● Aprendre a aplicar els coneixements adquirits i la seva capacitat de resolució de problemes en entorns nous o poc coneguts dintre de contextos més amplis o
+multidisciplinaris.
+
+● Saber identificar les dades rellevants i els tractaments necessaris (integració, neteja i validació) per dur a terme un projecte analític.
+
+● Aprendre a analitzar les dades adequadament per abordar la informació continguda en les dades.
+
+● Identificar la millor representació dels resultats per tal d’aportar conclusions sobre el problema plantejat en el procés analític.
+
+● Actuar amb els principis ètics i legals relacionats amb la manipulació de dades en funció de l'àmbit d'aplicació.
+
+● Desenvolupar les habilitats d'aprenentatge que els permetin continuar estudiant d'una manera que haurà de ser en gran manera autodirigida o autònoma.
+
+● Desenvolupar la capacitat de cerca, gestió i ús d'informació i recursos en l'àmbit de la ciència de dades.
+
+# Descripció de la Pràctica a realitzar
+L’objectiu d’aquesta activitat serà el tractament d’un dataset, que pot ser el creat a la pràctica 1 o bé qualsevol dataset lliure disponible a Kaggle (https://www.kaggle.com). Alguns exemples de dataset amb els que podeu treballar són:
+
+● Red Wine Quality (https://www.kaggle.com/uciml/red-wine-quality-cortez-et-al-2009 ).
+
+● Titanic: Machine Learning from Disaster (https://www.kaggle.com/c/titanic ).
+
+L’últim exemple correspon a una competició activa a Kaggle de manera que, opcionalment, podeu aprofitar el treball realitzat durant la pràctica per entrar en aquesta competició. Seguint les principals etapes d’un projecte analític, les diferents tasques a realitzar (i justificar) són les següents:
+
+# Pràctica:
+
+*****
+## DESCRIPCIÓ DEL DATASET
+*****
+
+> __Perquè és important i quina pregunta/problema pretén respondre?__
+
+<p>Kickstarter és una plataforma de micromecenatge (crowdfunding) nord-americana. En ella és possible finançar projectes creatius de tota classe, des de cinema independent fins productes tecnològics, passant per còmics, jocs o cuina.<p>
+
+<p>Tot projecte té especificades una dada d'inici i final de l'activitat a la plataforma, que seran les que el creador consideri oportunes, tot i que el rang normalment es troba entre unes poques setmanes i diversos mesos També s'indica quina és la recaptació mínima de diners per considerar el mecenatge com a exitós, i per tant iniciar el projecte. Durant el període de mecenatge, qualsevol usuari pot participar en el mecenatge, fet que normalment es realitza escollint un dels diferents nivells d'aportació establerts pel creador del projecte, què solen incloure una còpia o participació del producte final que es vol crear. Cal tenir en compte que les aportacions es fan efectives un cop hagi acabat el temps d'activitat fixat i només si s'ha assolit l'objectiu monetari inicial. Si no és el cas, el projecte es considera fracassat i no es realitza cap pagament.<p>
+
+<p>És per això que resulta de gran importància per a un nou creador revisar la trajectòria de projectes anteriors semblants. Específicament al nostre cas intentarem donar respostes a possibles dubtes a l'hora d'escollir les variables sobre les quals el creador té poder de decisió. Com podrien ser: la quantitat a demanar, la duració de la campanya o la ubicació, el moment del llançament, específicament per a un projecte de la categoria Jocs.<p>
+
+<p>El creador d'un projecte de jocs, ens contracta per realitzar un estudi per a resoldre les qüestions que té, ja que vol començar una campanya a kickstarter i vol saber si és millor publicar a agost o setembre o a la regió d'Europa o a Nord Amèrica. A més a més, el projecte ronda els 10.000 USD i no sap quant ha de durar la campanya. D'aquesta manera, s'estudiaran els projectes de la categoria "Games" més recents (2015 en endavant).<p>
+
+<p>A continuació, detallem el conjunt de dades inicial, amb els seus atributs i la seua descripció:<p>
+
+* __ID__               : Identificador únic del projecte.<p>
+* __name__             : Nom del projecte.<p>
+* __category__         : Categoria específica del projecte.<p>
+* __main_category__    : Categoria general del projecte.<p>
+* __currency__         : Moneda en la que gestiona la recaptació.<p>
+* __deadline__         : Data del final de la campanya de mecenatge.<p>
+* __goal__             : Quantitat minima de diners aportats per considerar el projecte exitós.<p>
+* __launched__         : Data de llençament de la campanya de mecenatge.<p>
+* __pledged__          : Quantitat aportada al final de la campanya.<p>
+* __state__            : Estat en que es troba el projecte.<p>
+* __backers__          : Nombre de persones mecenes.<p>
+* __country__          : País d'origen del projecte.<p>
+* __usd.pledged__      : Conversió a dolars americans de la quantitat recaptada (feta per Kickstarter)<p>
+* __usd_pledged_real__ : Conversió a dolars americans de la quantitat recaptada (feta per plataforma independent fixer.io)<p>
+* __usd_goal_real__    : Conversió a dolars americans de la quantitat requerida (feta per plataforma independent fixer.io)<p>
+
+*****
+## INTEGRACIÓ I SELECCIÓ DE LES DADES D'INTERÈS A ANALITZAR
+*****
+
+```{r}
+# Paquets
+suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(lubridate))
+suppressPackageStartupMessages(library(ggpubr)) 
+suppressPackageStartupMessages(library(nortest)) 
+suppressPackageStartupMessages(library(scales))
+suppressPackageStartupMessages(library(corrplot))
+
+# Llegim les dades
+data<- read.csv("ks-projects-201801.csv", header=T, sep=",")
+
+# Verifiquem l'estructura del joc de dades
+str(data)
+
+# Consultem les primeres files del conjunt de dades
+head(data)
+```
+
+<p>Observem que tenim, 378661 observacions i 15 atributs.<p> 
+
+<p>Verifiquem que no hi hagi projectes duplicats. La comprovació la fem a partir de la variable ID que és l'identificador únic del projecte.<p> 
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Projectes duplicats?
+length(unique(data$ID))
+```
+
+<p>No hi ha registres duplicats, ja que hi ha 378661 valors diferents de la variable ID, que és el nombre total d'observacions que conté el conjunt de dades.<p>
+
+<p>Una vegada, hem consultat si hi ha projectes duplicats, es pot prescindir de la columna ID, que com hem comentat abans, identifica el projecte. A banda, també s'elimina la variable name, ja que per a l'estudi que volem realitzar, l'atribut identificador i name no ens aporta valor.<p>
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Eliminem atribut ID i name
+data$ID   <- NULL
+data$name <- NULL
+```
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Estadístiques de valors buits
+colSums(is.na(data))
+colSums(data=="")
+```
+
+<p>Fem la consulta de la quantitat de categories pel que fa a la variable category i main_category<p>
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# category
+length(levels(data$category))
+# main_category
+length(levels(data$main_category))
+levels(data$main_category)
+```
+
+<p>Existeixen 159 categories per als projectes, distribuïdes en 15 categories principals. Com que treballarem només amb la categoria principal Games, s'eliminen per tant els atributs referents a categoria (category i main_category).<p>
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Filtrem dades: escollim només la categoria Games
+data               <- data[data$main_category=="Games",]
+# Eliminem atribut category i main_category
+data$category      <- NULL
+data$main_category <- NULL
+```
+
+<p>A continuació, formatem els atributs que fan referència a la data: launched and deadline. Pel que fa a la variable launched, les hores, minuts i segons, no ens interessa. El format per ambdues variables será YYYY-MM-DD. 
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Formategem launched i deadline
+data$launched <- as.Date(substr(as.character(data$launched), 1, 10), "%Y-%m-%d")
+data$deadline <- as.Date(as.character(data$deadline), "%Y-%m-%d")
+```
+
+<p>Fem la consulta dels estats del conjunt de dades inicial.<p>
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# state
+levels(data$state)
+```
+
+<p>Posteriorment seleccionem els registres a partir de l'any 2015 i descartem els projectes amb estat "live"<p>
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Filtrem dades 
+# Projectes del 2015 en endavant
+data    <- data[data$launched >= "2015-01-01",]
+# Projecte amb estat "failed" o "successful"
+data    <- data[data$state != "live",]
+# Eliminem els diferents nivells de la variable state
+data <- droplevels(data)
+# Verifiquem els diferents nivells
+levels(data$state)
+```
+
+<p>Considerem que és interessant, conèixer la durada dels projectes, per tant, creem una nova variable "duration_days", que serà la duració en dies del projecte, des de la data de llançament de la campanya (launched) fins a la data final de la campanya (deadline).<p>
+
+<p>Com a conseqüència eliminarem la variable deadline i farem una discretització de launched, on s'indicarà el mes de llançament. D'aquesta manera es podrà saber si el mes de l'any en què s'ha llançat el projecte afecta l'estat d'aquest.<p>
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Creem la variable duration_days.
+data$duration_days <- as.integer(data$deadline-data$launched)
+# Discretitzem launched
+data$launched      <- factor(month(data$launched), labels= c("January","February","March","April","May","June","July","August","September","October","November","December"))
+# Reducció de la dimensionalitat, eliminem atribut deadline
+data$deadline      <- NULL
+```
+
+<p>Igualment serà interessant disposar del percentatge total assolit, així com dels valors mitjans de les aportacions per mecenes i de les aportacions per dia.<p>
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Creem la variable mean_pledged
+data$mean_pledged <- ifelse(data$backers==0, data$mean_pledged<-0, data$mean_pledged<-data$usd_pledged_real/data$backers)
+
+# Creem la variable percent_pledged
+data$percent_pledged <- (data$usd_pledged_real/data$usd_goal_real)*100
+
+# Creem la variable pledged_byday
+data$pledged_byday <- data$usd_pledged_real/data$duration_days
+```
+
+<p>Podem prescindir de les variables, goal, pledge. La variable goal correspon a la quantitat mínima de diners aportats per considerar el projecte exitós, i la variable pledge és la quantitat aportada al final de la campanya. Existeixen tres variables més que fan referència a l'import, on s'ha realitzat una conversió a dòlars americans (USD), per tant per a realitzar l'anàlisi dels projectes, s'utilitzaran les conversions en dòlars, que correspon a les variables usd_goal_real, usd_plegded_real i usd.pledged.<p>
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Reducció de la dimensionalitat, eliminem atributs goal i pledged
+data$goal    <- NULL
+data$pledged <- NULL
+```
+
+<p>Pel que fa a la quantitat requerida del projecte (usd_goal_real), considerem que és millor discretitzar per grups.<p>
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Discretització de usd_goal_real
+data$usd_goal_lvl  <-
+            ifelse(data$usd_goal_real<2000, '<2000',
+                   ifelse(data$usd_goal_real<10000, '>=2000 & <10000',
+                          ifelse(data$usd_goal_real<50000, '>=10000 & <50000',
+                                 ifelse(data$usd_goal_real<100000, '>=50000 & <100000','>=100000'))))
+
+data$usd_goal_lvl <- factor(data$usd_goal_lvl, levels= c("<2000",">=2000 & <10000",">=10000 & <50000",">=50000 & <100000",">=100000"))
+
+#Categories de la variable usd_goal_real
+levels(data$usd_goal_lvl)
+```
+
+<p>També s'inclou un nou atribut "region", perquè volem distribuir els països per regió.<p>
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Creem la variable region.
+data$region <- ifelse(data$country=='N,0"', data$region<-NA,
+                      ifelse(data$country=="US"|data$country=="CA", data$region<-"North America",
+                             ifelse(data$country=="AU"|data$country=="NZ"|data$country=="HK"|
+                                      data$country=="SG"|data$country=="JP", data$region<- "Asia & Pacific",
+                                    ifelse(data$country=="MX", data$region<- "Latin America",
+                                           data$region<-"Europe")
+                                    )
+                             )
+                      )
+
+data$region <- as.factor(data$region)
+
+#Categories de la variable region
+levels(data$region)
+```
+
+<p>Una vegada, realitzat el punt de neteja de les dades i decidir com gestionar els valors buits o valors extrems, s'explicarà com queda el conjunt de dades finals. Ja que, després de l'estudi de l'apartat de neteja de dades, pot ser que també s'elimini algun atribut o descartem registres que puguen ser incoherents o erronis.<p>
+
+
+*****
+## NETEJA DE LES DADES
+*****
+
+> __Les dades contenen zeros o elements buits? Com gestionaries aquests casos?__
+
+<p>Els valors 0 no sempre fa referència a un valor perdut, pot ser un valor buit legítim. A continuació, s'analitzen les variables del conjunt per tal de saber si contenen zeros o elements buits, per saber com gestionar-los i considerar si es tracta d'errors o no. Per exemple, sense fer una anàlisi exhaustiva, podríem dir, que en les variables relacionades amb els diners si existís un zero, no hauria de ser un error, ja que poden haver-hi projectes en els quals no hi hagi cap mena d'aportació econòmica, en canvi veure un element buit ens podria generar dubte, ja que podria ser un zero que no hi ha hagut aportació econòmica o bé que no se sap que ha passat.<p>
+
+<p>Consultem les estadístiques de valors buits.<p>
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Estadístiques de valors buits per atributs
+colSums(is.na(data))
+```
+
+<p>En aquest cas, s'observa que l'única variable que conté valors buits és la variable usd_pledged i region. En canvi, s'observa que per a la variable usd_pledge_real no existeix cap valor buit. Ambdues variables (usd_pledged i usd_pledged_real), fan referència a la conversió a dolars americans de la quantitat recaptada, amb la diferència que la conversió de usd_pledged està feta per Kickstarter i usd_pledged_real està feta per una plataforma independent fixer.io. En aquest cas, eliminar l'atribut usd_pledged, no suposa una pèrdua d'informació, ja que també tenim la informació a la variable uds_pledge_real i és més consistent. Ara bé, abans d'eliminar usd_pledged, es consultarà quins valors conté usd_pledged_real quan usd_pledged no està informada. És clar que aquestes dues variables no són dependents, ja que el calcul de la conversió es realitza a partir de la variable goal, on a l'inici de la pràctica s'ha vist que aquesta variable goal tampoc contenia valors buits com la variable usd_pledge_real. Però si sembla que la variable usd_pledged i region poden estar relacionades ja que contenen el mateix nombre d'elements buits. Per tant, també es consultarà el valor de country.<p>
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Consultem dades quan usd.pledged conté valors buits
+head(data[is.na(data$usd.pledged),])
+# Consultem dades quan region conté valors buits
+head(data[is.na(data$region),])
+# Consultem dades quan usd_pledge_real és 0 per saber si usd_pledge també té valors buits
+head(data[which(data$usd_pledged_real == 0),])
+```
+
+<p>S'observa que quan usd.pledge i region, tenen valors buits, la variable country és N,0 i la variable state és undefined, per tant hi ha una relació entre aquestes variables. I quan la variable usd_pledged_real és 0, usd_pledge no té valors buits.<p>
+
+<p>Les úniques variables amb valors que podríem considerar incoherents són state (undefined) i country (N,0"), i sembla que estan relacionades.<p>
+
+<p>A través de la següents gràfiques comprovem, la relació entre state (undefined) i country(N,0"), i quan la variable  usd.pledged i region quan contenen valors buits, està relacionada amb el valor country = N,0" i state = undefined.<p>
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Relació state vs country
+ggplot(data,aes(x=country,fill=state))+geom_bar(position="fill")+ylab("Distribució")+
+   theme(text = element_text(size=12),axis.text.x = element_text(angle=60, hjust=1))
+
+# usd.pledged == NA vs state vs country
+ggplot(data[is.na(data$usd.pledged),],aes(x=country,fill=state))+geom_bar(position="fill")+ylab("Distribució")+
+   theme(text = element_text(size=12),axis.text.x = element_text(angle=60, hjust=1))
+
+# region == NA vs state vs country
+ggplot(data[is.na(data$region),],aes(x=region,fill=state))+geom_bar(position="fill")+ylab("Distribució")+
+   theme(text = element_text(size=12),axis.text.x = element_text(angle=60, hjust=1))
+```
+<p> A la primera gràfica, observem que l'estat "undefined" existeix tant sols per a quan country té el valor (N,0"). A més si ens fixem, tampoc existeixen els estats "failed" i "successful" quan country és (N,0").<p>
+
+<p> A la segona gràfica, s'observa que quan usd.pledged té valor buit (NA), el country te tan sols el valor (N,0"), i el mateix passa a la tercera gràfica, que quan region té valor buit (NA) el country té tan sols el valor (N,0"), cosa que és normal, ja que la variable region s'ha construït a partir del country.<p>
+
+<p>Per tant considerem els valors country = N,0" com a incorrectes i els eliminem de l'estudi.<p>
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Eliminem country = N,0" 
+data <- data[data$country!='N,0"',]
+# Quants registres amb data$usd.pledged == NA hi ha?
+count(data[is.na(data$usd.pledged),])
+# Quants registres amb data$region == NA hi ha?
+count(data[is.na(data$region),])
+```
+
+<p>Una vegada eliminats els registres amb country = N,0", comprovem que no hi ha cap observació al conjunt de dades amb usd.pledged i region amb valors buits. Finalment, decidim eliminar la variable usd.pledged, perquè usd_pledged_real és més consistent.<p>
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Reducció de la dimensionalitat, eliminem atribut usd.pledged
+data$usd.pledged <- NULL
+```
+
+<p> A continuació, es comprova per a les variables quantitatives, si el fet de contenir 0 o no es tracta d'un error, o en canvi, és un valor buit legítim.<p>
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# backers - nombre de persones mecenes
+count(data[which(data$backers == 0),])
+# duration_days 
+count(data[which(data$duration_days == 0),])
+# usd_pledged_real 
+count(data[which(data$usd_pledged_real == 0),])
+# usd_goal_real 
+count(data[which(data$usd_goal_real == 0),])
+# mean_pledged
+count(data[which(data$mean_pledged == 0),])
+# percent_pledged
+count(data[which(data$percent_pledged == 0),])
+# pledged_byday
+count(data[which(data$pledged_byday == 0),])
+```
+
+<p> S'observa que per a les variables backers, usd_pledge_real, mean_pledged, percent_pledged  pledged_byday existeixen cap a uns 1675 registres informats amb el valor 0. En aquest cas, pot tenir un sentit, és a dir, poden haver-hi projectes en els quals no s'hagi recaptat diners i projectes en els que no hi hagi cap nombre de persones mecenes. En aquest cas, el valor té sentit, ara bé per exemple, si el nombre de persones mecenes és zero i el projecte és considerat com a exitós no tindria sentit. I el mateix amb la variable usd_pledged_real, el fet que no es recapten diners per a un projecte i el seu estat és exitós tampoc tindria sentit.<p>
+
+<p>També té un sentit que les variables mean_pledged, percent_pledged  pledged_byday tinguen el mateix nombre de registres a 0, ja que tal com s'han creat són dependents de la variable usd_pledge_real<p>
+
+<p>Pel que fa a la variable usd_goal_real i duration_days, no contenen cap valor zero. Per aquestes variables, trobar-se un valor zero, seria considerat un valor perdut o un error. Ja que el més normal és que per a un projecte s'informi d'una quantitat requerida, i almenys hauria d'haver-hi un dia entre la data de llançament del mecenatge i la data final de la campanya de mecenatge del projecte.<p>
+
+<p>Per tant, s'analitza si tenen sentit els valors a zero per a les variables backers i usd_pleged_real.<p>
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Te sentit el 0 de backers i usd_pleged_real?
+# Valors de la variable state
+levels(data$state)
+# Relació backers vs state
+data_aux  <- data[which(data$backers == 0),]
+tabla_aux <- table(data_aux$state, data_aux$backers)
+tabla_aux
+# Relació usd_pledged_real vs state
+data_aux  <- data[which(data$usd_pledged_real == 0),]
+tabla_aux <- table(data_aux$state,data_aux$usd_pledged_real)
+tabla_aux
+```
+
+<p>Després de consultar la taula de contingència, pel que fa a la relació entre la variable backers i state i la variable usd_pledge_real i state. S'observa que efectivament quan usd_pledge_real és 0, cap projecte ha sigut exitós, el mateix passa amb la variable backers.<p>
+
+> __Identificació i tractament de valors extrems.__
+
+<p>Com ja sabem, els valors extrems són les dades que difereixen significativament dels valors de les distribucions normals d’una variable. Els valors estan molt lluny respecte als altres, sobre 3 desviacions estàndard sobre la mitjana del conjunt. Es generen sospites si les dades han sigut generades amb el mateix mecanisme o no. Per tant, són una amenaça important per a la validesa i generalització dels resultats, poden causar problemes en l'anàlisi estadística de les dades, com augmentar la variància de l'error; si es distribueixen de forma no aleatòria, s'alteren les probabilitats de cometre errors de tipus I i II amb els contrasts d'hipòtesis; també poden influir o esbiaixar greument en les estimacions que poden ser d'interès important, ja que poden no ser generades per la població que ens interessa. En resum, augmenten de manera dràstica els errors d'inferència i redueix dràsticament la força i el poder de les proves estadístiques.<p>
+
+<p>A continuació s'analitzen si hi ha valors extrems i si són errors de les dades o no.<p>
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Funció per a formatejar les etiquetes dels imports
+million <- function (x) { number_format(accuracy = 1,
+                                        scale = 1/1000000,
+                                        suffix = "Milions",
+                                        big.mark = ",")(x) }
+
+# Funció per a formatejar les etiquetes dels imports
+mil <- function (x) { number_format(accuracy = 1,
+                                        scale = 1/1000,
+                                        suffix = "Mil",
+                                        big.mark = ",")(x) }
+# Gràfic - Boxplot - backers
+outlier1 <- ggplot(data, aes(y=backers)) +
+            geom_boxplot() +
+            scale_x_continuous(name="", breaks = NULL, labels = NULL) +
+            scale_y_continuous(name="Nombre de persones mecenes") +
+            ggtitle("OUTLIERS - Boxplot - backers") + 
+            theme(plot.title = element_text(size=10),)
+outlier1
+
+# Gràfic - Boxplot - usd_pledged_real
+outlier2 <- ggplot(data, aes(y=usd_pledged_real)) +
+            geom_boxplot() +
+            scale_x_continuous(name="", breaks = NULL, labels = NULL) +
+            scale_y_continuous(name="Quantitat recaptada en USD", labels = million) +
+            ggtitle("OUTLIERS - Boxplot - usd_pledged_real") + 
+            theme(plot.title = element_text(size=10),)
+outlier2
+
+
+# Boxplot - usd_goal_real
+outlier3 <- ggplot(data, aes(y=usd_goal_real)) +
+            geom_boxplot() +
+            scale_x_continuous(name="", breaks = NULL, labels = NULL) +
+            scale_y_continuous(name="Quantitat requerida en USD", labels = million) +
+            ggtitle("OUTLIERS - Boxplot - usd_goal_real") + 
+            theme(plot.title = element_text(size=10),)
+outlier3
+
+# Boxplot - duration_days
+outlier4 <- ggplot(data, aes(y=duration_days)) +
+            geom_boxplot() +
+            scale_x_continuous(name="", breaks = NULL, labels = NULL) +
+            scale_y_continuous(name="Dies de la campanya") +
+            ggtitle("OUTLIERS - Boxplot - duration_days") + 
+            theme(plot.title = element_text(size=10),)
+outlier4
+
+# Boxplot - mean_pledged
+outlier5 <- ggplot(data, aes(y=mean_pledged)) +
+            geom_boxplot() +
+            scale_x_continuous(name="", breaks = NULL, labels = NULL) +
+            scale_y_continuous(name="Mitjana d'aportacions") +
+            ggtitle("OUTLIERS - Boxplot - mean_pledged") + 
+            theme(plot.title = element_text(size=10),)
+outlier5
+
+# Boxplot - percent_pledged
+outlier6 <- ggplot(data, aes(y=percent_pledged)) +
+            geom_boxplot() +
+            scale_x_continuous(name="", breaks = NULL, labels = NULL) +
+            scale_y_continuous(name="Percentatge sobre el total inicial", labels = million) +
+            ggtitle("OUTLIERS - Boxplot - percent_pledged") + 
+            theme(plot.title = element_text(size=10),)
+outlier6
+
+# Boxplot - pledged_byday
+outlier7 <- ggplot(data, aes(y=pledged_byday)) +
+            geom_boxplot() +
+            scale_x_continuous(name="", breaks = NULL, labels = NULL) +
+            scale_y_continuous(name="Mitjana de la quantitat aportada diària", labels = mil) +
+            ggtitle("OUTLIERS - Boxplot - pledged_byday")+ 
+            theme(plot.title = element_text(size=10),)
+outlier7
+
+# Agafem els valors dels outliers
+outlier_backers       <- boxplot(data$backers, plot = FALSE)$out
+outlier_pledged       <- boxplot(data$usd_pledged_real, plot = FALSE)$out
+outlier_goal          <- boxplot(data$usd_goal_real, plot = FALSE)$out
+outlier_days          <- boxplot(data$duration_days, plot = FALSE)$out
+outlier_mean          <- boxplot(data$mean_pledged, plot = FALSE)$out
+outlier_percent       <- boxplot(data$percent_pledged, plot = FALSE)$out
+outlier_pledged_byday <- boxplot(data$pledged_byday, plot = FALSE)$out
+
+# Recompte d'outliers, entesos com els que queden "fora" del boxplot
+
+outliersNumber <- c(length(outlier_backers), length(outlier_pledged), length(outlier_goal), length(outlier_days), length(outlier_mean), length(outlier_percent), length(outlier_pledged_byday))
+
+outliersNumber
+```
+
+<p>Si observem el recompte de valors extrems, és un nombre molt alt, on el fet d'eliminar tots els outliers pot tenir un efecte considerable sobre el conjunt de dades en el que estem treballant. Però el fet de deixar aquests valors, també afecta les mitjanes, variàncies...<p>
+
+<p>Optem per realitzar una comparativa de com quedarien els resultats si eliminem els valors extrems que estàn més enllà d'un percentil determinat, en aquest cas del 0.5.<p>
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+percentil <- 0.5
+data_aux <- data[data$backers          < quantile(data$backers, percentil) &
+                 data$usd_pledged_real < quantile(data$usd_pledged_real, percentil) &
+                 data$usd_goal_real    < quantile(data$usd_goal_real, percentil) &
+                 data$duration_days    < quantile(data$duration_days, percentil) &
+                 data$mean_pledged     < quantile(data$mean_pledged, percentil) &
+                 data$percent_pledged  < quantile(data$percent_pledged, percentil) &
+                 data$pledged_byday    < quantile(data$pledged_byday, percentil),]
+
+summary(data_aux$state)
+
+# Files
+dim(data_aux)
+```
+
+<p>Eliminant els valors extrems que estan més enllà del percentil 0.5, el nombre de registres del conjunt de dades disminueix considerablement, per tant les mitjanes de les dades també es veuran afectades, com es pot comprovar a continuació a les gràfiques de comparatives del conjunt de dades amb valors extrems i sense valors extrems, d'altra banda, s'observa que tots els casos d'èxit són considerats outliers.<p>
+
+<p>Per tant, considerant que el conjunt de dades disminueix molt seriosament i que sobre tot ens carregaríem un grup del conjunt de dades a estudiar que són els estats exitosos, decidim no eliminar els outliers i continuar amb les conclusions de l'estudi. Ja que aquests valors extrems no només no són incorrectes, sinó que, com ja hem indicat formen part de la població a estudiar.<p>
+
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Comparem amb els resultats anteriors
+outlier8 <- ggplot(data_aux, aes(y=backers)) +
+            geom_boxplot() +
+            scale_x_continuous(name="", breaks = NULL, labels = NULL) +
+            scale_y_continuous(name="Nombre de persones mecenes") +
+            ggtitle("SENSE - Boxplot - backers") + 
+            theme(plot.title = element_text(size=10),)
+
+# Grafica OUTLIERS vs SENSE - backers
+ggarrange(outlier1, outlier8, ncol = 2, nrow = 1)
+```
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Gràfic - Boxplot - usd_pledged_real
+outlier9 <- ggplot(data_aux, aes(y=usd_pledged_real)) +
+            geom_boxplot() +
+            scale_x_continuous(name="", breaks = NULL, labels = NULL) +
+            scale_y_continuous(name="Quantitat recaptada en USD") +
+            ggtitle("SENSE - Boxplot - usd_pledged_real") + 
+            theme(plot.title = element_text(size=10),) 
+
+# Grafica OUTLIERS vs SENSE - usd_pledged_real
+ggarrange(outlier2, outlier9, ncol = 2, nrow = 1)
+```
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Boxplot - usd_goal_real
+outlier10 <- ggplot(data_aux, aes(y=usd_goal_real)) +
+            geom_boxplot() +
+            scale_x_continuous(name="", breaks = NULL, labels = NULL) +
+            scale_y_continuous(name="Quantitat requerida en USD") +
+            ggtitle("SENSE - Boxplot - usd_goal_real") + 
+            theme(plot.title = element_text(size=10),)
+
+# Grafica OUTLIERS vs SENSE - usd_goal_real
+ggarrange(outlier3, outlier10, ncol = 2, nrow = 1)
+```
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Boxplot - duration_days
+outlier11 <- ggplot(data_aux, aes(y=duration_days)) +
+             geom_boxplot() +
+             scale_x_continuous(name="", breaks = NULL, labels = NULL) +
+             scale_y_continuous(name="Dies de la campanya") +
+             ggtitle("SENSE - Boxplot - duration_days") + 
+             theme(plot.title = element_text(size=10),)
+
+# Grafica OUTLIERS vs SENSE - duration_days
+ggarrange(outlier4, outlier11, ncol = 2, nrow = 1)
+```
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Boxplot - mean_pledged
+outlier12 <- ggplot(data_aux, aes(y=mean_pledged)) +
+             geom_boxplot() +
+             scale_x_continuous(name="", breaks = NULL, labels = NULL) +
+             scale_y_continuous(name="Mitjana d'aportacions") +
+             ggtitle("SENSE - Boxplot - mean_pledged") + 
+             theme(plot.title = element_text(size=10),)
+
+# Grafica OUTLIERS vs SENSE - mean_pledged
+ggarrange(outlier5, outlier12, ncol = 2, nrow = 1)
+```
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Boxplot - mean_pledged
+outlier13 <- ggplot(data_aux, aes(y=percent_pledged)) +
+             geom_boxplot() +
+             scale_x_continuous(name="", breaks = NULL, labels = NULL) +
+             scale_y_continuous(name="Percentatge sobre el total inicial") +
+             ggtitle("SENSE - Boxplot - percent_pledged") + 
+             theme(plot.title = element_text(size=10),)
+
+# Grafica OUTLIERS vs SENSE - percent_pledged
+ggarrange(outlier6, outlier13, ncol = 2, nrow = 1)
+```
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Boxplot - pledged_byday
+outlier14 <- ggplot(data_aux, aes(y=pledged_byday)) +
+             geom_boxplot() +
+             scale_x_continuous(name="", breaks = NULL, labels = NULL) +
+             scale_y_continuous(name="Mitjana d'aportacions diaria") +
+             ggtitle("SENSE - Boxplot - pledged_byday") + 
+             theme(plot.title = element_text(size=10),)
+
+# Grafica OUTLIERS vs SENSE - pledged_byday
+ggarrange(outlier7, outlier14, ncol = 2, nrow = 1)
+```
+
+<p>Una vegada, s'han analitzat les estadístiques de valors buits i els valors extrems, recapitulem com queda el conjunt de dades a analitzar al punt 4.<p>
+
+<p>Eliminem les variables country, usd_pledged_real i usd_goal, no les hem eliminat abans perque voliem estudiar el seu contingunt dins del punt 3, per saber si els valors buits, 0... eren coherents o no. <p>
+
+<p>Com que hem creat una variable regio, considerem que tenir la variable country és informació redundant i la variable currency tampoc es farà servir, ja que els imports estàn tots convertits al dòlar americà.<p>
+
+<p>Eliminem la variable usd_pledged_real, ja que al crear la variable percent_pledged i tenir percentatges es més còmode treballar amb aquesta variable que amb la del conjunt de dades original.<p>
+
+<p>El fet d'haver creat una variable usd_goal_lvl discretitzada, fa que tingam informació redundant i eliminem la variable usd_goal_real.<p>
+
+<p>Creem una variable discretitzada per al percentatge sobre el total inicial assolit al final de la campanya, ja que com els valors extrems són tant dispersos, per a mostrar alguna que altra gràfica pot resultar complexa la seua comprensió. No s'elimina la variable quantitativa perquè és una variable objectiu per a prediure.<p>
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Discretització de percent_pledged 
+data$percent_pledged_lvl  <-
+            ifelse(data$percent_pledged <100, '<100',
+                   ifelse(data$percent_pledged==100, '=100','>100'))
+
+data$percent_pledged_lvl <- factor(data$percent_pledged_lvl, levels= c("<100","=100",">100"))
+
+#Categories de la variable usd_goal_real
+levels(data$percent_pledged_lvl)
+```
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Reducció de la dimensionalitat, eliminem atributs country, usd_pledged_real i usd_goal_real
+data$country          <- NULL
+data$currency         <- NULL
+data$usd_pledged_real <- NULL
+data$usd_goal_real    <- NULL
+```
+
+<p>Finalment, es filtren els projectes amb estat "failed" i "successful" del conjunt de dades inicial, ja que l'objectiu de l'estudi és estudiar els estats d'aquests projectes.<p>
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+data <- data[(data$state=="failed" | data$state=="successful"),]
+data <- droplevels(data)
+
+# Verifiquem els diferents nivells
+levels(data$state)
+
+# Resum final de l'estructura de les dades
+str(data)
+# Resum de les dades
+summary(data)
+# Consultem les primeres files del conjunt de dades
+head(data)
+```
+
+<p>Per tant, el conjunt de dades final queda:<p>
+
+* __launched__            : Mes de llençament de la campanya.<p>
+* __state__               : Resultat de la campanya (successful/failed).<p>
+* __backers__             : Nombre de persones mecenes.<p>
+* __duration_days__       : Duració de la campanya en dies.<p>
+* __mean_pledged__        : Mitjana d'aportacions al projecte per persona.<p>
+* __percent_pledged__     : Percentatge sobre el total inicial assolit al final de la campanya.<p>
+* __pledged_byday__       : Mitjana de la quantitat aportada diària.<p>
+* __region__              : Regió d'origen del projecte.<p>
+* __usd_goal_lvl__        : Quantitat demanada inicialment.<p>
+* __percent_pledged_lvl__ : Rang de percentatge sobre el total inicial assolit al final de la campanya.<p>
+
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Escrivim les dades finals en un fitxer csv
+write.csv(data, "ks-projects-201801_final.csv")
+```
+
+*****
+## ANÀLISI DE LES DADES
+*****
+
+> __Selecció dels grups de dades que es volen analitzar/comparar (planificació dels anàlisis a aplicar)__
+
+<p>Imaginem que som els creadors del projecte, i volem resoldre les següents qüestions en concret:<p> 
+
+* Comprovar probabilitat d'èxit mitjançant percentatge assolit quan el projecte es troba entorn dels 10.000 USD.<p> 
+* Tenim capacitat per publicar el projecte a Europa o a Amèrica del Nord, quina regió és millor?<p>
+* Com que som els creadors del projecte, sabem que el projecte estarà acabat a l'agost, volem saber si ens interesa començar la campanya inmediatament o esperar a setembre.<p>
+
+<p>Per tant seleccionarem els grups adients:<p>
+
+__CAS ESPECÍFIC META__
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Cas específic meta
+data_goalinf <- data[(data$usd_goal_lvl==">=2000 & <10000"),]
+data_goalsup <- data[(data$usd_goal_lvl==">=10000 & <50000"),]
+```
+
+<p>Tenim capacitat per publicar el projecte a Europa o a Amèrica del Nord<p>
+
+__CAS ESPECÍFIC REGIÓ__
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Cas específic regió
+data_regeu <- data[data$region=="Europe",]
+data_regna <- data[data$region=="North America",]
+```
+
+__CAS ESPECÍFIC MES DE LLENçAMENT__
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Cas especific mes de llençament
+data_monau <- data[data$launched=="August",]
+data_monse <- data[data$launched=="September",]
+```
+
+> __Comprovació de la normalitat i homogeneïtat de la variància.__
+
+<p>Per a la comprovació de la normalitat, com que el conjunt de dades que fem servir te més de 5000 registres, no podem utilitzar shapiro.test ja que ens donaria error, per tant s'utilitzarà ad.test on si p-value és menor que el valor 0.05 les variables no seguiran una distribució normal.<p>
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Fem servir ad.test que si funciona per a conjunts de dades de mes de 5000 registres
+ad.test(data$backers)
+ad.test(data$duration_days)
+ad.test(data$mean_pledged)
+ad.test(data$percent_pledged)
+ad.test(data$pledged_byday)
+```
+
+<p>Cap dada està normalitzada perquè el valor de p-value està per davall de 0.05<p>
+
+<p>Mitjançant la funció qqnorm, també es pot observar que les dades no seguixen una normalització, aquest punt el mostrarem a l'apartat de les gràfiques.<p>
+
+<p> Cap dada esta normalitatzada perque el valor de p-value esta per davall de 0.05<p>
+
+<p>Com que les dades no seguixen una distribució normal, pel que fa a la homogeneïtat de la variància fem servir el test de Fligner-Killeen. En aquest cas, la hipòtesi nul·la assumeix igualtat de variàncies en els diferents grups de dades, de manera que p-valors inferiors al nivell de significació indicaran heteroscedasticitat.<p>
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# percent_pledged ~ usd_goal_lvl
+fligner.test(percent_pledged ~ usd_goal_lvl, data = data)
+# percent_pledged ~ region
+fligner.test(percent_pledged ~ region, data = data)
+# percent_pledged ~ launched
+fligner.test(percent_pledged ~ launched, data = data)
+```
+
+<p>Tenim un p-valor inferior a 0,05, per tant rebutgem la hipòtesi que les variàncies de les mostres són homogènies.<p>
+
+> __Aplicació de proves estadístiques.__
+
+__PROVES DE CONTRAST HIPÒTESIS:__
+
+<p>A continuació és realitzen les proves de contrast d'hipòtesis per respondre a les preguntes:<p>
+
+* L'èxit és independent de la regió?<p>
+* L'èxit és independent del moment del llençament?<p>
+* L'èxit és independent de la quantitat demanada?<p>
+
+__L'èxit és independent de la quantitat demanada?__<p>
+
+<p> Si el projecte es troba entorn als 10.000 USD ens interessa comprobar l'èxit mitjançant percentatge assolit.<p>
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Taula de contingencia pel total, obtenim chi-test
+tcont <- as.matrix(xtabs(~usd_goal_lvl+state, data))
+tcont
+
+summary(tcont)
+
+# Test de wilcoxon pel cas específic
+wilcox.test(data_goalinf$percent_pledged, data_goalsup$percent_pledged, correct = FALSE)
+```
+
+* __L'èxit és independent de la regió?__ <p>
+
+<p>Si podem escollir entre publicar el projecte en Europa o en Amèrica ens interessa comprobar-ho.<p>
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Taula de contingencia pel total, obtenim chi-test
+tcont <- as.matrix(xtabs(~region+state, data))
+tcont
+summary(tcont)
+
+# Test de wilcoxon pel cas especific
+wilcox.test(data_regeu$percent_pledged, data_regna$percent_pledged, correct = FALSE)
+```
+
+* __L'èxit és independent del moment del llençament?__<p>
+
+<p>Si dubtem entre llençar el projecte a l'agost o al setembre podem comprobar-ho.<p>
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Taula de contingencia pel total, obtenim chi-test
+tcont <- as.matrix(xtabs(~launched+state, data))
+tcont
+summary(tcont)
+
+# test de wilcoxon pel cas especific
+wilcox.test(data_monau$percent_pledged, data_monse$percent_pledged, correct = FALSE)
+
+```
+
+<p>En cap dels tres casos estudiats podem acceptar la hipòtesi nul·la, ja que els valors p tant de chi-quadrat com de wilcoxon estan a prop del 0. Per tant els valors no són independents.<p>
+
+__Correlacions__:
+
+<p>La correlació medeix la relació lineal entre dues variables.<p>
+
+<p>El coeficient va de -1 a 1.<p>
+
+* r = 1, la relació és positiva perfecta <p>
+* 0 < r < 1 la relación es positiva <p>
+* r = 0 no hi ha relació lineal <p>
+* -1 < r < 0 la relación es negativa <p>
+* r = -1 la relació és negativa perfecta <p>
+
+A continuació, es mostra la matriu de correlació per tal de conèixer la dependència/independència dels atributs, hem de tenir en compte que els atributs per a la matriu de correlació han de ser quantitatius. 
+
+<p>Per tant, mitjançant les correlacions, intentem respondre a les següents preguntes:<p>
+
+* Com afecta el nombre de mecenes (backers) amb les quantitats aportades per persona, per dia i percentatge assolit? 
+
+Podem generar la taula de correlacions de les variables quantitatives, que són: backers, duration_days, mean_pledged, percent_pledged i pledged_byday.
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+cor(data[,4:7])
+```
+
+<p> S'observa que hi ha una forta relació entre la variable backers i la variable pledged_byday, ja que com hem indicat anteriorment quan la relació més prop està del valor 1, més forta és aquesta. Hi ha una relació positiva entre percent_pledged i mean_pledged, encara que aquesta no és tan forta com la relació entre pledged_byday<p>
+
+<p>A més també es pot observar que que efectivament el nombre de mecenes afecta directament a les tres variables relacionades amb aportacions (quantitats aportades per persona, per dia, i percentatge assolit).<p>
+
+<p>També podem veure que la duració de la campanya de mecenatge té un efecte lleugerament invers al resultat, però amb poca incidència.<p>
+
+__Prediccions:__
+
+<p>Les variables a predir seran percent_pledged i state. Aplicarem models de regressió utilitzant les variables sobre les quals podem decidir i que hem comprovat poden afectar el resultat.<p> 
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# dataset per la regressió
+data_r <- data[(data$usd_goal_lvl==">=2000 & <10000"|data$usd_goal_lvl==">=10000 & <50000") &
+               (data$region=="Europe"|data$region=="North America") &
+               (data$launched=="August"|data$launched=="September"),]
+
+# Per a la regressió discretitzem duració en <=30 o >30
+data_r$duration_days <- as.factor(ifelse(data_r$duration_days<=30, "<=30",">30"))
+```
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Model de Regressió Lineal Múltiple per predir percent_pledged (variable quantitativa)
+mlm <- lm(percent_pledged~usd_goal_lvl+region+launched+duration_days, data_r)
+summary(mlm)
+```
+
+<p>El coeficient de determinació R-squared és molt baix, indicant que l'explicació a la variància donada és inferior a l'1%, per tant no tenim un model predictiu acurat.<p>
+
+<p>Els p-valors són molt alts, indicant que les variables són estadísticament irrellevants. El resultat és coherent a causa de la gran quantitat d'outliers i al càlcul fet amb variables qualitatives.<p>
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Model de Regressió Logística per predir state (variable qualitativa)
+mglm <- glm(state~usd_goal_lvl+region+launched+duration_days, family=binomial, data_r)
+summary(mglm)
+```
+
+<p>P-valors baixos indiquen rellevància estadística.<p>
+
+<p>Les variables dicotòmiques indiquen quin valor utilitza la fórmula.<p>
+
+<p>Les variables que més afecten al resultat són la quantitat objectiu >=10.000USD (negativament) i la regió Nord-Amèrica (positivament), seguits de duració>30 (negatiu) i llençament al setembre (positiu).<p>
+
+<p>La diferència entre les desviacions nules i residuals (2554-2484) és petita, el qual ens indica que el model pot ser poc explicatiu.<p>
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Model: ln(p/1-p) = -0.07445 + (-0.70319 * usd_goal_lvl>=10000) + (0.35940 * region North America) + (0.18225 * launched September) + (-0.20685 * duration_days>30)
+exp(-0.07445+0.35940+0.18225)
+
+```
+
+<p>Com que el que tenim és un logaritme de odds, el calculem fent l'exponent de e. El resultat de la predicció és un Odd Ratio de 1.59552.<p>
+
+<p>El resultat ens diu que, segons el model i responent als dubtes plantejats, per al nostre projecte de Joc seria recomanable fixar la meta en una quantitat inferior a 10.000USD, fer el llançament a nord-americà al setembre, i establir una duració de campanya no superior als 30 dies.<p>
+
+<p>Les probabilitats d'èxit calculades en aquest cas seràn de un 61.47%, per sobre del valor bàsic del model obtingut (48.13%)<p>
+
+*****
+## REPRESENTACIÓ DELS RESULTATS A PARTIR DE TAULES i GRÀFIQUES.
+*****
+
+__DISTRIBUCIONS VARIABLES QUALITATIVES__
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Creem funcio per a construir els grafics amb percentatges
+function_barres_percentatges <- function(var1,titolxlab,titol)
+{
+  # Càlcul freqüència relativa
+  freq_rel <- as.data.frame(prop.table(table(var1)))
+  # Calculem el percentatge a partir de la freqüència relativa
+  freq_rel$Freq <- round((freq_rel$Freq * 100),2)
+  # Preparant dades
+  df_credit_profile <- data.frame(
+                       Categories  = freq_rel$var1,
+                       Percentatge = freq_rel$Freq)
+
+  grafic <- ggplot(df_credit_profile, aes(x=Categories, y= Percentatge)) + geom_bar(color="black", fill="grey",stat="identity") +
+  # Convert to pie (polar coordinates) and add labels
+      geom_text(aes(label = Percentatge), position = position_stack(vjust = 0.5)) + 
+      xlab(titolxlab)+theme(axis.text.x = element_text(angle = 45)) +
+  # Add title
+      ggtitle(titol) +
+  # Tidy up the theme
+      theme(plot.title = element_text(hjust = 0.5, color = "#666666"))
+  
+  return(grafic)
+}
+
+# state - Diagrama de barres
+g4 <- function_barres_percentatges(data$state,"state","Estats")
+g4
+# Region - Diagrama de barres
+g5 <- function_barres_percentatges(data$region,"region","Regió")
+g5
+# Education - Diagrama de barres
+g6 <- function_barres_percentatges(data$usd_goal_lvl,"usd_goal_lvl","Quantitat demanada inicialment")
+g6
+
+# Mes de llançament - Diagrama de barres
+g7 <- function_barres_percentatges(data$launched,"launched","Mes de llançament")
+g7
+```
+
+__RESPOSTA A LES PREGUNTES PLANTEJADES AMB GRÀFIQUES__
+
+<p>A la següent gràfica, es veu clarament que els projectes exitosos tenen el percentatge sobre el total inicial assolit al final de la campanya igual a 100 o major de 100, el que vol dir aquest percentatge és la quantitat aportada al final de la campanya és igual o superior a la quantitat demandada inicialment. Mentre que els projectes no exitosos, no arriben al 100, ja que la quantitat aportada al final no és igual o no supera la demandada inicialment.<p>
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Gràfiques - Relació state vs percent_pledged
+plot_by_state <- ggplot(data,aes(percent_pledged_lvl,fill=state)) +
+                 geom_bar(position = "fill") +
+                 labs(x="Percentatge sobre el total inicial", y="%") +              
+                 guides(fill=guide_legend(title="")) +
+                 ggtitle("Relació state vs percent_pledged")
+
+plot_by_state
+```
+
+
+__L’èxit és independent de la quantitat demanada?__
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Gràfiques - Quantitat demanada inicialment (usd_goal_lvl) 
+ga <- ggplot(data, aes(usd_goal_lvl , fill=percent_pledged_lvl)) +
+      geom_bar(position = "fill") +
+      labs(x="Quantitat demanada en USD", y="Percentatge") +              
+      guides(fill=guide_legend(title="")) +
+      ggtitle("L’èxit és independent de la quantitat demanada?") +
+      theme(axis.text.x = element_text(angle = 45))
+ga
+```
+
+__L’èxit és independent de la regió?__
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Gràfiques - Regio
+ga <- ggplot(data, aes(region , fill=percent_pledged_lvl)) +
+      geom_bar(position = "fill") +
+      labs(x="Regió", y="Percentatge") +              
+      guides(fill=guide_legend(title="")) +
+      ggtitle("L’èxit és independent de la regió?") +
+      theme(axis.text.x = element_text(angle = 45))
+ga
+```
+
+__L'èxit és independent del moment del llançament?__
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Gràfiques - Month 
+ga <- ggplot(data, aes(launched , fill=percent_pledged_lvl)) +
+      geom_bar(position = "fill") +
+      labs(x="Regió", y="Percentatge") +              
+      guides(fill=guide_legend(title="")) +
+      ggtitle("L'èxit és independent del moment del llançament?") +
+      theme(axis.text.x = element_text(angle = 45))
+
+ga
+```
+
+<p>Per tant per a donar una resposta a les preguntes plantejades, podríem dir que la variable inicialment demandada influeix en l'èxit del projecte, on a partir de la gràfica, es pot veure que tal com augmenta la quantitat demanada hi ha menys percentatge de projectes exitosos. A la segona gràfica, podem veure que la regió on menys percentatge de projectes exitosos hi ha és a Latina-Amèrica, la regió de Nord Amèrica està per damunt d'Àsia i Pacífic i d'Europa, però no és un percentatge destacable. Consultant la tercera gràfica, es pot observar que el mes que destaca un poc més sobre la resta, és el mes de setembre. Per tant al creador interessat del projecte, li podrem dir que seria recomanable fixar una meta inicial menor a 10000 dòlars americans, seria millor que publiqués el projecte a la regió de Nord-Amèrica i seria millor llançar el projecte al mes de setembre.<p>
+
+<p>Als gràfics, pel que fa als projectes que tenen un percentatge sobre el total inicial = 100, es veu una fina línia, per tant si volem aprofundir més amb els resultats, es poden mostrar els percentatges, tal com s'indica a la següent taula:<p>
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# % èxit vs quantitat demanada
+T_Freq_Abs_usd_goal_lvl <- table(data$usd_goal_lvl, data$percent_pledged_lvl)
+T_Freq_Rel_usd_goal_lvl <- prop.table(T_Freq_Abs_usd_goal_lvl, margin = 1)
+T_Freq_Rel_usd_goal_lvl
+
+# % èxit vs regio
+T_Freq_Abs_region <- table(data$region, data$percent_pledged_lvl)
+T_Freq_Rel_region <- prop.table(T_Freq_Abs_region, margin = 1)
+T_Freq_Rel_region
+
+# % èxit vs month
+T_Freq_Abs_launched <- table(data$launched, data$percent_pledged_lvl)
+T_Freq_Rel_launched <- prop.table(T_Freq_Abs_launched, margin = 1)
+T_Freq_Rel_launched
+```
+
+__GRÀFICS NORMALITZACIÓ__
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+qqnorm(data$backers, pch = 1, frame = FALSE, main="backers")
+qqline(data$backers, col = "steelblue", lwd = 2)
+
+qqnorm(data$duration_days, pch = 1, frame = FALSE, main="duration_days")
+qqline(data$duration_days, col = "steelblue", lwd = 2)
+
+qqnorm(data$mean_pledged, pch = 1, frame = FALSE, main="mean_pledged")
+qqline(data$mean_pledged, col = "steelblue", lwd = 2, )
+
+qqnorm(data$percent_pledged, pch = 1, frame = FALSE, main="percent_pledged")
+qqline(data$percent_pledged, col = "steelblue", lwd = 2)
+
+qqnorm(data$pledged_byday, pch = 1, frame = FALSE, main="pledged_byday")
+qqline(data$pledged_byday, col = "steelblue", lwd = 2)
+
+```
+
+<p> En les gràfiques que fan referència a la normalitatzació, pel que fa a les variables quantitatives, s'observa que les dades tampoc segueixen una normalització a causa dels valors extrems, ja que es veuen punts que surten de la línia continuada de punts.<p>
+
+__GRÀFICS CORRELACIÓ__
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+cor(data[,3:7])
+corrmatrix <- cor(data[,3:7])
+corrplot(corrmatrix, method = "number")
+```
+<p>A través de la gràfica de correlació, es veu clarament que hi ha una forta relació entre la variable backers i la variable pledged_byday, per tant a la pregunta com afecta el nombre de mecenes (backers) amb les quantitats aportades per persona, per dia i percentatge assolit podem dir que per a les quantitats aportades per dia té una relació considerablement forta, mentre que per a les quantitats aportades per persona i percentatge assolit, hi ha una relació positiva però és mínima.<p>
+
+*****
+## RESOLUCIÓ DEL PROBLEMA
+*****
+
+> __A partir dels resultats obtinguts, quines són les conclusions? Els resultats permeten respondre al problema?__
+
+<p>El fet de voler estudiar els casos exitosos dels projectes de la categoria de "Games" en concret, no ens permet eliminar els valors extrems, ja que si els llevarem, el conjunt de dades es veuria afectat amb un gran nombre de registres, i a banda també hem comprovat que aplicant un percentil del 0.5 arribaríem inclús a descartar els projectes amb un estat exitós, quedant-se amb un conjunt de dades del qual no podríem fer ús perquè no podríem estudiar les característiques dels projectes exitosos.
+En estar analitzant projectes fallits i projectes exitosos, és normal que el nombre de valors extrems siguin tan dispars, cosa que fa que les variables quantitaves no segueixin una distribució normal.<p>
+
+<p>Com s'ha dit inicialment I s'ha pogut comprovar a les gràfiques I als mètodes d'anàlisis, un projecte Kickstarter es considera exitós quan l'import final de la campanya és igual o superior a l'import inicialment demandat, per tant tots els projectes que tenen un percentatge del total assolit menor a 100 seran projectes fallits. En el nostre conjunt final de dades, tots els projectes amb un percentatge del total assolit major o igual a 100 són projectes exitosos perquè hem descartat la resta d'estats, ja que els projectes en curs (state=live) o projectes que per exemple projectes que s'han considerat exitosos però finalment han sigut cancel·lats, no ens interessen perquè el que volem respondre és a les persones interessades a crear un projecte de jocs amb les característiques dels projectes considerats exitosos abans de començar. Per característiques definim:<p>
+
+•	Import inicial demanat<p>
+•	Regió<p>
+•	Mes llançament<p>
+
+<p>Hem pogut respondre al creador del projecte, i li podem indicar que el millor moment per llançar un projecte entre agost I setembre, és setembre i si ho fa a la regió de Nord Amèrica, el projecte tindrà més probabilitat d'èxit. La variable més significativa a tenir en compte per a la creació del projecte, és l'import inicial demanat, on sempre serà millor crear un projecte amb un import menor a 10000 dòlars americans, ja que com major és l'import més probabilitat hi haurà que un projecte sigui fallit.
+Pel que fa a la normalització, ja hem dit que les dades no segueixen una distribució normal. El motiu es deu als valors extrems. El fet d'estar estudiant dos estats tan diferents on l'import final "defineix" l'estat del projecte, pot fer que hi hagi molts projectes amb valor 0 i molts altres amb imports vertaderament elevats I fer que les variables quantitatives no estiguin normalitzades ni tinguin una homogeneïtat de la variància per als grups estudiats en concret.<p>
+
+<p>La variable duració no afecta gaire al resultat, però té una tendència negativa. Per tant en cas de dubte recomanaríem intentar no superar la primera meitat dels valors, centrada en 30 dies.<p>
+
+<p>A banda també li podem dir al creador, que és interessant enfocar els esforços de publicitat a atreure la quantitat més gran de mecenes possible, més que a intentar que la mitjana d'aportacions per mecenes sigui alta.<p>
+ 
+<p>Una opció haguera pogut ser seleccionar aquells projectes on l’import final fos major o igual a l’import demandat però d’aquesta manera tampoc tindrem els projectes amb un estat fallit I per tant no serviria per al nostre estudi.<p>
+
+
+*****
+## CODI
+*****
+
+# Recursos
+Els següents recursos són d’utilitat per la realització de la pràctica:
+
+● Calvo M., Subirats L., Pérez D. (2019). Introducción a la limpieza y análisis de los datos. Editorial UOC.
+
+● Megan Squire (2015). Clean Data. Packt Publishing Ltd.
+
+● Jiawei Han, Micheine Kamber, Jian Pei (2012). Data mining: concepts and techniques. Morgan Kaufmann.
+
+● Jason W. Osborne (2010). Data Cleaning Basics: Best Practices in Dealing with Extreme Scores. Newborn and Infant Nursing Reviews; 10 (1): pp. 1527-3369.
+
+● Peter Dalgaard (2008). Introductory statistics with R. Springer Science & Business Media.
+
+● Wes McKinney (2012). Python for Data Analysis. O’Reilley Media, Inc.
+
+● Tutorial de Github https://guides.github.com/activities/hello-world.
+
+# Criteris de valoració
+Tots els apartat són obligatoris. La ponderació dels exercicis és la següent:
+
+● Els apartats 1, 2 i 6 valen 0,5 punts.
+
+● Els apartats 3,5 i 7 valen 2 punts.
+
+● L’apartat 4 val 2,5 punts.
+
+Es valorarà la idoneïtat de les respostes, que han de ser clares i completes. Les diferents etapes han d’estar ben justificades i acompanyades del codi corresponent. També es valorarà la síntesi i claredat, a través de l’ús de comentaris, del codi resultant, així com la qualitat de les dades finals analitzades.
+
+# Format i data de lliurament
+Durant la setmana del 23 de desembre el grup podrà lliurar al professor una entrega parcial opcional. Aquesta entrega parcial és molt recomanable per tal de rebre assessorament sobre la pràctica i verificar que la direcció presa és la correcta. Es lliuraran comentaris als estudiants que hagin efectuat l’entrega parcial però no comptarà per la nota de la pràctica. En l’entrega parcial els estudiants hauran de lliurar per correu electrònic (mcalvogonza@uoc.edu) l’enllaç al repositori Github amb el que hagin avançat.
+
+Pel que fa a l’entrega final, cal lliurar un únic fitxer que contingui l’enllaç a Github on hi hagi:
+
+1. Una Wiki on hi hagi els noms dels components del grup i una descripció dels fitxers.
+
+2. Un document Word, Open Office o PDF amb les respostes a les preguntes i els noms dels components del grup. A més, al final de document, haurà d’aparèixer la següent taula de contribucions al treball, la qual ha de signar cada integrant del grup amb les seves inicials. Les inicials representen la confirmació de que l’integrant ha participat en aquell apartat. Tots els integrants han de participar en cadascun dels apartats, de manera que, idealment, els apartats hauran d’estar signats per tots els integrants.
+
+3. Una carpeta amb el codi generat per analitzar les dades.
+
+4. El fitxer CSV amb les dades originals.
+
+5. El fitxer CSV amb les dades finals analitzades.
+
+Aquest document de l’entrega final de la Pràctica 2 s’ha de lliurar a l’espai de Lliurament i Registre d’AC de l’aula abans de les 23:59 del dia 7 de gener. No s’acceptaran lliuraments fora de termini.
+
