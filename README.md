@@ -10,7 +10,7 @@ S'utilitzen tècniques de neteja i anàlisi de dades amb el llenguatge de progra
 
 La pràctica s'ha realitzat per un equip de dues persones format per:
 
-* Iván Borrego García
+* Ivan Borrego Garcia
 * Cristina Sanchis Puerto
 
 ## Fitxers
